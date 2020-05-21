@@ -8,3 +8,15 @@
 mat-spinner{
   margin: auto;
 }
+@media  (min-width: 320px) {
+.post-image img{
+  width: 10rem;
+  box-shadow: 1px 1px 5px black;
+}
+}
+@media  (min-width: 700px) {
+  .post-image img{
+    width: 35rem;
+    box-shadow: 1px 1px 5px black;
+  }
+  }

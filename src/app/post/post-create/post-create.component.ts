@@ -3,7 +3,7 @@ import { Post } from '../post-list/post';
 import { NgForm, FormGroup, FormControl, Validators } from '@angular/forms';
 import { PostsServiceService } from '../posts-service.service';
 import { ActivatedRoute, ParamMap } from '@angular/router';
-
+import { mimeType } from "./mime-type.validator";
 
 @Component({
   selector: 'app-post-create',
@@ -33,7 +33,7 @@ export class PostCreateComponent implements OnInit {
     //this.postCreated.emit(post);
     if(this.mode==='create'){
       this.isLoading=true;
-      this.postsService.addPost(this.form.value.title,this.form.value.content);
+      this.postsService.addPost(this.form.value.title,this.form.value.content,this.form.value.image);
       this.form.reset();
     }else{
       this.postsService.updatePost(this.postId,this.form.value.title,this.form.value.content);
@@ -59,7 +59,7 @@ export class PostCreateComponent implements OnInit {
       {
         'title': new FormControl(null,{validators:[Validators.required,Validators.minLength(3)]}),
         'content': new FormControl(null,{validators:[Validators.required]}),
-        'image': new FormControl(null,{validators:[Validators.required]})
+        'image': new FormControl(null,{validators:[Validators.required],asyncValidators:[mimeType]})
       }
     );
     this.route.paramMap.subscribe((paramMap: ParamMap)=>{
@@ -69,15 +69,20 @@ export class PostCreateComponent implements OnInit {
         this.isLoading=true;
         this.postsService.getPost(this.postId)
         .subscribe((postData)=>{
-            this.post.title=postData._id,
-            this.post.title=postData.title,
-            this.post.title=postData.content
-            this.form.setValue({
-              title: postData.title,
-              content: postData.content
-            });
+          this.isLoading = false;
+          this.post = {
+            id: postData._id,
+            title: postData.title,
+            content: postData.content,
+            imagePath: postData.imagePath
+          };
+          console.log(this.post);
+          this.form.setValue({
+            title: this.post.title,
+            content: this.post.content,
+            image: this.post.imagePath
+          });
         });
-        this.isLoading=false;
       }else{
         this.mode='create';
         this.postId=null;
