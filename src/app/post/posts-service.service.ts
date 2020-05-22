@@ -4,6 +4,7 @@ import { Subject } from 'rxjs';
 import { HttpClient } from "@angular/common/http";
 import { map } from "rxjs/operators";
 import { Router } from '@angular/router';
+import { Message } from '@angular/compiler/src/i18n/i18n_ast';
 @Injectable({
   providedIn: 'root'
 })
@@ -55,10 +56,29 @@ export class PostsServiceService {
 
   }
 
-  updatePost(id: string, title: string, content: string) {
-    const post: Post = { id: id, title: title, content: content , imagePath: null};
-    this.http.put('http://localhost:3000/api/posts/' + id,post)
-    .subscribe(response=>console.log(response));
+  updatePost(id: string, title: string, content: string,image: string | File) {
+    let postData: Post | FormData;
+    if(typeof(image)==='object'){
+      postData= new FormData();
+      postData.append("id",id);
+      postData.append("title",title);
+      postData.append("content",content);
+      postData.append("image",image,title);
+    }else{
+      postData = {
+        id: id,
+        title: title,
+        content: content,
+        imagePath: image
+      };
+    }
+    this.http.put('http://localhost:3000/api/posts/' + id,postData)
+    .subscribe(responseData=>{
+      const updatedPosts = [...this.posts];
+      const oldPostIndex = updatedPosts.findIndex(p=> p.id===id);
+      const post: Post = { id: id, title: title, content: content , imagePath: ""};
+      //this.postUpdated.next([...updatedPosts]);
+    });
     this.router.navigate(["/"]);
   }
 
