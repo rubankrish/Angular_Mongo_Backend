@@ -13,9 +13,10 @@ export class PostsServiceService {
   private postUpdated = new Subject<Post[]>();
   constructor(private http: HttpClient,private router: Router) { }
 
-  getPosts() {
+  getPosts(postPerPage:number, currentPage: number) {
     //return [...this.posts];
-    this.http.get<{ message: string, posts: any }>('http://localhost:3000/api/posts')
+    const queryParams = `?pageSize=${postPerPage}&page=${currentPage}`;
+    this.http.get<{ message: string, posts: any }>('http://localhost:3000/api/posts'+queryParams)
       .pipe(map((postData) => {
         return postData.posts.map(post => {
           return {
